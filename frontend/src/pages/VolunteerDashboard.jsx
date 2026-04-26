@@ -56,7 +56,7 @@ const VolunteerDashboard = () => {
     const handleJoin = async (eventId) => {
         try {
             await axios.post(`http://localhost:5000/api/events/${eventId}/join`, {}, config);
-            showToast('🎉 Successfully joined the event!');
+            showToast(' Successfully joined the event!');
             fetchEvents();
             fetchStats();
         } catch (err) {
@@ -85,7 +85,7 @@ const VolunteerDashboard = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">🤝</span>
+                <span className="icon"></span>
                 <div>
                     <h2>Volunteer Dashboard</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Welcome, {user.name} — Thank you for volunteering!</p>
@@ -95,29 +95,29 @@ const VolunteerDashboard = () => {
             {/* Stats */}
             <div className="stat-grid">
                 <div className="stat-card indigo">
-                    <div className="stat-icon">📅</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Events Joined</div>
                     <div className="stat-value" style={{ color: 'var(--primary)' }}>{stats.joinedEvents || 0}</div>
                 </div>
                 <div className="stat-card green">
-                    <div className="stat-icon">📋</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">My Tasks</div>
                     <div className="stat-value" style={{ color: 'var(--success)' }}>{stats.myTasks || 0}</div>
                 </div>
                 <div className="stat-card amber">
-                    <div className="stat-icon">✅</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Completed Tasks</div>
                     <div className="stat-value" style={{ color: 'var(--accent)' }}>{stats.completedTasks || 0}</div>
                 </div>
                 <div className="stat-card red">
-                    <div className="stat-icon">🌟</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Available Events</div>
                     <div className="stat-value" style={{ color: 'var(--danger)' }}>{stats.availableEvents || 0}</div>
                 </div>
             </div>
 
             {/* Available Events to Join */}
-            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>🌟 Available Events</h3>
+            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}> Available Events</h3>
             {availableEvents.length > 0 ? (
                 <div className="event-cards-grid">
                     {availableEvents.map(ev => (
@@ -128,10 +128,10 @@ const VolunteerDashboard = () => {
                             </div>
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>{ev.description}</p>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                                <span>📍 {ev.location}</span> &nbsp;|&nbsp; <span>📅 {formatDate(ev.date)}</span>
-                                {ev.createdBy && <span> &nbsp;|&nbsp; 🏛️ {ev.createdBy.ngoName || ev.createdBy.name}</span>}
+                                <span> {ev.location}</span> &nbsp;|&nbsp; <span> {formatDate(ev.date)}</span>
+                                {ev.createdBy && <span> &nbsp;|&nbsp; ️ {ev.createdBy.ngoName || ev.createdBy.name}</span>}
                             </div>
-                            <button className="btn btn-success btn-sm" onClick={() => handleJoin(ev._id)}>🙋 Join Event</button>
+                            <button className="btn btn-success btn-sm" onClick={() => handleJoin(ev._id)}> Join Event</button>
                         </div>
                     ))}
                 </div>
@@ -144,7 +144,7 @@ const VolunteerDashboard = () => {
             {/* My Joined Events */}
             {joinedEvents.length > 0 && (
                 <>
-                    <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📅 My Joined Events</h3>
+                    <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}> My Joined Events</h3>
                     <div className="table-wrapper">
                         <table className="table">
                             <thead>
@@ -161,7 +161,7 @@ const VolunteerDashboard = () => {
                                     <tr key={ev._id}>
                                         <td style={{ fontWeight: 600 }}>{ev.title}</td>
                                         <td>{formatDate(ev.date)}</td>
-                                        <td>📍 {ev.location}</td>
+                                        <td> {ev.location}</td>
                                         <td>{ev.createdBy?.ngoName || ev.createdBy?.name || '-'}</td>
                                         <td><span className={`badge ${statusBadge(ev.status)}`}>{ev.status}</span></td>
                                     </tr>
@@ -175,7 +175,7 @@ const VolunteerDashboard = () => {
             {/* My Tasks */}
             {myTasks.length > 0 && (
                 <>
-                    <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📋 My Assigned Tasks</h3>
+                    <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}> My Assigned Tasks</h3>
                     <div className="table-wrapper">
                         <table className="table">
                             <thead>
@@ -202,9 +202,9 @@ const VolunteerDashboard = () => {
                                                 onChange={(e) => handleUpdateTaskStatus(t._id, e.target.value)}
                                                 style={{ padding: '0.3rem 0.5rem', fontSize: '0.8rem', borderRadius: '6px', border: '1px solid var(--border)' }}
                                             >
-                                                <option value="To Do">📝 To Do</option>
-                                                <option value="In Progress">🔄 In Progress</option>
-                                                <option value="Done">✅ Done</option>
+                                                <option value="To Do"> To Do</option>
+                                                <option value="In Progress"> In Progress</option>
+                                                <option value="Done"> Done</option>
                                             </select>
                                         </td>
                                     </tr>

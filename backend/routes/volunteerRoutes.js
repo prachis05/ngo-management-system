@@ -7,10 +7,12 @@ const {
     deleteVolunteer,
     getMyVolunteerProfile,
     updateMySkills,
+    getVolunteerActivity,
 } = require('../controllers/volunteerController');
-const { protect, admin, authorize } = require('../middleware/authMiddleware');
+const { protect, admin, authorize, verified } = require('../middleware/authMiddleware');
 
 // Volunteer self-service routes (must be before /:id)
+router.get('/me/dashboard', protect, verified, authorize('Volunteer'), getVolunteerActivity);
 router.get('/me', protect, authorize('Volunteer'), getMyVolunteerProfile);
 router.put('/me/skills', protect, authorize('Volunteer'), updateMySkills);
 

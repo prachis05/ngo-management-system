@@ -8,8 +8,8 @@ const formatDate = (dateStr) => {
 
 const statusBadge = (status) => {
     const map = {
-        'Upcoming':  'badge-info',
-        'Ongoing':   'badge-warning',
+        'Upcoming': 'badge-info',
+        'Ongoing': 'badge-warning',
         'Completed': 'badge-success',
         'Cancelled': 'badge-danger',
     };
@@ -49,10 +49,10 @@ const Events = () => {
         try {
             if (editId) {
                 await axios.put(`http://localhost:5000/api/events/${editId}`, formData, config);
-                showToast('✅ Event updated!');
+                showToast(' Event updated!');
             } else {
                 await axios.post('http://localhost:5000/api/events', formData, config);
-                showToast('🎉 Event created!');
+                showToast('Event created successfully');
             }
             setFormData({ title: '', description: '', date: '', location: '', status: 'Upcoming' });
             setEditId(null);
@@ -85,7 +85,7 @@ const Events = () => {
     const handleJoin = async (id) => {
         try {
             await axios.post(`http://localhost:5000/api/events/${id}/join`, {}, config);
-            showToast('🎉 Successfully joined event!');
+            showToast('Successfully joined event!');
             fetchEvents();
         } catch (err) {
             showToast(err.response?.data?.message || 'Error joining event', 'error');
@@ -103,32 +103,32 @@ const Events = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">📅</span>
+                <span className="icon"></span>
                 <h2>Event Management</h2>
             </div>
-            
+
             {canManage && (
                 <div className="form-card">
-                    <h3>{editId ? '✏️ Edit Event' : '➕ Create Event'}</h3>
+                    <h3>{editId ? ' Edit Event' : ' Create Event'}</h3>
                     <form onSubmit={onSubmit}>
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Event Title</label>
-                                <input type="text" placeholder="Community Cleanup" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
+                                <input type="text" placeholder="Community Cleanup" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} required />
                             </div>
                             <div className="form-group">
                                 <label>Event Date</label>
-                                <input type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} required />
+                                <input type="date" value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} required />
                             </div>
                         </div>
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Location</label>
-                                <input type="text" placeholder="Delhi" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} required />
+                                <input type="text" placeholder="Delhi" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} required />
                             </div>
                             <div className="form-group">
                                 <label>Status</label>
-                                <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                                <select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })}>
                                     <option>Upcoming</option>
                                     <option>Ongoing</option>
                                     <option>Completed</option>
@@ -138,14 +138,14 @@ const Events = () => {
                         </div>
                         <div className="form-group">
                             <label>Description</label>
-                            <input type="text" placeholder="Describe the event..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
+                            <input type="text" placeholder="Describe the event..." value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} required />
                         </div>
                         <div style={{ display: 'flex', gap: '0.75rem' }}>
                             <button type="submit" className="btn btn-primary" style={{ width: 'auto' }} disabled={isDisabled}>
-                                {loading ? '⏳ Saving...' : (editId ? '💾 Update Event' : '➕ Create Event')}
+                                {loading ? ' Saving...' : (editId ? 'Update Event' : ' Create Event')}
                             </button>
                             {editId && (
-                                <button type="button" className="btn btn-secondary" onClick={() => {setEditId(null); setFormData({title: '', description: '', date: '', location: '', status: 'Upcoming'});}}>
+                                <button type="button" className="btn btn-secondary" onClick={() => { setEditId(null); setFormData({ title: '', description: '', date: '', location: '', status: 'Upcoming' }); }}>
                                     Cancel
                                 </button>
                             )}
@@ -175,7 +175,7 @@ const Events = () => {
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{ev.description}</div>
                                 </td>
                                 <td>{formatDate(ev.date)}</td>
-                                <td>📍 {ev.location}</td>
+                                <td>{ev.location}</td>
                                 <td>{ev.createdBy?.ngoName || ev.createdBy?.name || '-'}</td>
                                 <td><span className={`badge ${statusBadge(ev.status)}`}>{ev.status}</span></td>
                                 <td>
@@ -184,16 +184,16 @@ const Events = () => {
                                 {(canManage || user.role === 'Volunteer') && (
                                     <td>
                                         {canManage && (
-                                            <>
-                                                <button className="btn btn-sm btn-edit" onClick={() => handleEdit(ev)} style={{ marginRight: '0.4rem' }}>✏️ Edit</button>
-                                                <button className="btn btn-sm btn-delete" onClick={() => handleDelete(ev._id)}>🗑️ Delete</button>
-                                            </>
+                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                                <button className="btn btn-sm btn-edit" onClick={() => handleEdit(ev)} style={{ marginRight: '0.4rem' }}> Edit</button>
+                                                <button className="btn btn-sm btn-delete" onClick={() => handleDelete(ev._id)}> Delete</button>
+                                            </div>
                                         )}
                                         {user.role === 'Volunteer' && !isJoined(ev) && (ev.status === 'Upcoming' || ev.status === 'Ongoing') && (
-                                            <button className="btn btn-sm btn-success" onClick={() => handleJoin(ev._id)}>🙋 Join</button>
+                                            <button className="btn btn-sm btn-success" onClick={() => handleJoin(ev._id)}>Join</button>
                                         )}
                                         {user.role === 'Volunteer' && isJoined(ev) && (
-                                            <span className="badge badge-success">✅ Joined</span>
+                                            <span className="badge badge-success">Joined</span>
                                         )}
                                     </td>
                                 )}

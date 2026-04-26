@@ -41,4 +41,13 @@ const admin = (req, res, next) => {
     }
 };
 
-module.exports = { protect, admin, authorize };
+// Check if user is verified
+const verified = (req, res, next) => {
+    if (req.user && req.user.verificationStatus === 'Approved') {
+        next();
+    } else {
+        return res.status(403).json({ message: 'Your identity verification is pending or rejected.' });
+    }
+};
+
+module.exports = { protect, admin, authorize, verified };

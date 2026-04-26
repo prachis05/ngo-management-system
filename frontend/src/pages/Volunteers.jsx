@@ -48,10 +48,10 @@ const Volunteers = () => {
         try {
             if (editId) {
                 await axios.put(`http://localhost:5000/api/volunteers/${editId}`, payload, config);
-                showToast('✅ Volunteer updated!');
+                showToast(' Volunteer updated!');
             } else {
                 await axios.post('http://localhost:5000/api/volunteers', payload, config);
-                showToast('✅ Volunteer added!');
+                showToast(' Volunteer added!');
             }
             setFormData({ name: '', email: '', skills: '', status: 'Available' });
             setEditId(null);
@@ -87,13 +87,13 @@ const Volunteers = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">🤝</span>
+                <span className="icon"></span>
                 <h2>Volunteer Management</h2>
             </div>
             
             {canManage && (
                 <div className="form-card">
-                    <h3>{editId ? '✏️ Edit Volunteer' : '➕ Add Volunteer'}</h3>
+                    <h3>{editId ? '️ Edit Volunteer' : ' Add Volunteer'}</h3>
                     <form onSubmit={onSubmit}>
                         <div className="form-row">
                             <div className="form-group">
@@ -121,7 +121,7 @@ const Volunteers = () => {
                         </div>
                         <div style={{ display: 'flex', gap: '0.75rem' }}>
                             <button type="submit" className="btn btn-primary" style={{ width: 'auto' }} disabled={isDisabled}>
-                                {loading ? '⏳ Saving...' : (editId ? '💾 Update' : '➕ Add Volunteer')}
+                                {loading ? ' Saving...' : (editId ? ' Update' : ' Add Volunteer')}
                             </button>
                             {editId && (
                                 <button type="button" className="btn btn-secondary" onClick={() => {setEditId(null); setFormData({name: '', email: '', skills: '', status: 'Available'});}}>
@@ -157,8 +157,8 @@ const Volunteers = () => {
                                 <td><span className={`badge ${statusBadge(v.status)}`}>{v.status}</span></td>
                                 {canManage && (
                                     <td>
-                                        <button className="btn btn-sm btn-edit" onClick={() => handleEdit(v)} style={{ marginRight: '0.4rem' }}>✏️ Edit</button>
-                                        <button className="btn btn-sm btn-delete" onClick={() => handleDelete(v._id)}>🗑️ Delete</button>
+                                        <button className="btn btn-sm btn-edit" onClick={() => handleEdit(v)} style={{ marginRight: '0.4rem' }}>️ Edit</button>
+                                        <button className="btn btn-sm btn-delete" onClick={() => handleDelete(v._id)}>️ Delete</button>
                                     </td>
                                 )}
                             </tr>

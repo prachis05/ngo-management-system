@@ -24,9 +24,27 @@ const userSchema = mongoose.Schema(
             type: String,
             default: '',
         },
+        idProof: {
+            type: String,
+            default: null,
+        },
+        verificationStatus: {
+            type: String,
+            enum: ['Pending', 'Approved', 'Rejected'],
+            default: 'Approved',
+            // Donors and Admins skip verification. NGOs and Volunteers are set to Pending during registration logic.
+        },
         isApproved: {
             type: Boolean,
             default: true,
+        },
+        city: {
+            type: String,
+            default: ''
+        },
+        skills: {
+            type: [String],
+            default: []
         },
     },
     {

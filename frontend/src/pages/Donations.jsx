@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const formatINR = (num) => '₹' + Number(num).toLocaleString('en-IN');
 
@@ -21,7 +22,7 @@ const Donations = () => {
     const { user } = useContext(AuthContext);
     const [donations, setDonations] = useState([]);
     const [ngos, setNgos] = useState([]);
-    const [formData, setFormData] = useState({ amount: '', campaign: '', ngoId: '' });
+    const [formData, setFormData] = useState({ amount: '', campaign: '', ngoId: '', isRecurring: false });
     const [loading, setLoading] = useState(false);
     const [toast, setToast] = useState(null);
 
@@ -63,9 +64,13 @@ const Donations = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post('http://localhost:5000/api/donations', formData, config);
-            showToast('🎉 Donation successful! Thank you for your contribution.', 'success');
-            setFormData({ amount: '', campaign: '', ngoId: '' });
+            const payload = {
+                ...formData,
+                frequency: formData.isRecurring ? 'Monthly' : 'One-Time'
+            };
+            await axios.post('http://localhost:5000/api/donations', payload, config);
+            showToast(' Donation successful! Thank you for your contribution.', 'success');
+            setFormData({ amount: '', campaign: '', ngoId: '', isRecurring: false });
             fetchDonations();
         } catch (error) {
             showToast(error.response?.data?.message || 'Error processing donation', 'error');
@@ -81,14 +86,14 @@ const Donations = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">💰</span>
+                <span className="icon"></span>
                 <h2>{user.role === 'NGO' ? 'Donations Received' : 'Donations'}</h2>
             </div>
 
             {/* Donation Form - Only for Donors and Admin */}
             {showForm && (
                 <div className="form-card" style={{ maxWidth: '520px' }}>
-                    <h3>💳 Make a Donation</h3>
+                    <h3> Make a Donation</h3>
                     <form onSubmit={handleDonate}>
                         <div className="form-group">
                             <label>Select NGO</label>
@@ -111,8 +116,18 @@ const Donations = () => {
                             <label>UPI / Card Number (Mock)</label>
                             <input type="text" placeholder="user@upi or 1111-2222-3333-4444" required />
                         </div>
+                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <input 
+                                type="checkbox" 
+                                id="isRecurring"
+                                checked={formData.isRecurring}
+                                onChange={e => setFormData({...formData, isRecurring: e.target.checked})}
+                                style={{ width: 'auto', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="isRecurring" style={{ margin: 0, cursor: 'pointer', fontWeight: 500 }}>Make this a monthly donation</label>
+                        </div>
                         <button type="submit" className="btn-primary" disabled={isDisabled}>
-                            {loading ? '⏳ Processing...' : '🎁 Donate Now'}
+                            {loading ? ' Processing...' : formData.isRecurring ? ' Setup Monthly Donation' : ' Donate Now'}
                         </button>
                     </form>
                 </div>
@@ -120,7 +135,7 @@ const Donations = () => {
 
             {/* Donation History */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                📜 {user.role === 'Admin' ? 'All Donations' : user.role === 'NGO' ? 'Donations to My NGO' : 'My Donation History'}
+                 {user.role === 'Admin' ? 'All Donations' : user.role === 'NGO' ? 'Donations to My NGO' : 'My Donation History'}
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -129,24 +144,38 @@ const Donations = () => {
                             {(user.role === 'Admin' || user.role === 'NGO') && <th>Donor</th>}
                             {user.role !== 'NGO' && <th>NGO</th>}
                             <th>Campaign</th>
+                            <th>Type</th>
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Date</th>
+                            {user.role === 'Donor' && <th>Receipt</th>}
                         </tr>
                     </thead>
                     <tbody>
                         {donations.map(d => (
                             <tr key={d._id}>
                                 {(user.role === 'Admin' || user.role === 'NGO') && <td style={{ fontWeight: 500 }}>{d.donorName}</td>}
-                                {user.role !== 'NGO' && <td>🏛️ {d.ngoName || 'General'}</td>}
+                                {user.role !== 'NGO' && <td>️ {d.ngoName || 'General'}</td>}
                                 <td>{d.campaign}</td>
-                                <td style={{ fontWeight: 600 }}>{formatINR(d.amount)}</td>
+                                <td>
+                                    <span className={`badge ${d.isRecurring ? 'badge-info' : 'badge-default'}`}>
+                                        {d.isRecurring ? 'Monthly' : 'One-Time'}
+                                    </span>
+                                </td>
+                                <td style={{ fontWeight: 600 }}>{formatINR(d.amount)}{d.isRecurring ? '/mo' : ''}</td>
                                 <td><span className={`badge ${statusBadge(d.status)}`}>{d.status}</span></td>
                                 <td>{formatDate(d.createdAt)}</td>
+                                {user.role === 'Donor' && (
+                                    <td>
+                                        <Link to={`/donations/${d._id}`} className="btn btn-sm btn-secondary">
+                                             View Receipt
+                                        </Link>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                         {donations.length === 0 && (
-                            <tr><td colSpan={6} className="table-empty">No donations found</td></tr>
+                            <tr><td colSpan={user.role === 'Donor' ? 7 : 7} className="table-empty">No donations found</td></tr>
                         )}
                     </tbody>
                 </table>

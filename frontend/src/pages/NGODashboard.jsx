@@ -64,7 +64,7 @@ const NGODashboard = () => {
         setLoading(true);
         try {
             await axios.post('http://localhost:5000/api/events', formData, config);
-            showToast('🎉 Event created successfully!');
+            showToast(' Event created successfully!');
             setFormData({ title: '', description: '', date: '', location: '', status: 'Upcoming' });
             fetchEvents();
             fetchStats();
@@ -92,7 +92,7 @@ const NGODashboard = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">🏛️</span>
+                <span className="icon">️</span>
                 <div>
                     <h2>NGO Dashboard</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{user.ngoName || user.name} — Managing your organization</p>
@@ -102,22 +102,22 @@ const NGODashboard = () => {
             {/* Stats */}
             <div className="stat-grid">
                 <div className="stat-card indigo">
-                    <div className="stat-icon">📅</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">My Events</div>
                     <div className="stat-value" style={{ color: 'var(--primary)' }}>{stats.myEvents || 0}</div>
                 </div>
                 <div className="stat-card green">
-                    <div className="stat-icon">💰</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Donations Received</div>
                     <div className="stat-value" style={{ color: 'var(--success)' }}>{formatINR(stats.totalDonations)}</div>
                 </div>
                 <div className="stat-card amber">
-                    <div className="stat-icon">🎁</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Donation Count</div>
                     <div className="stat-value" style={{ color: 'var(--accent)' }}>{stats.donationCount || 0}</div>
                 </div>
                 <div className="stat-card red">
-                    <div className="stat-icon">🤝</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Volunteers Engaged</div>
                     <div className="stat-value" style={{ color: 'var(--danger)' }}>{stats.volunteerCount || 0}</div>
                 </div>
@@ -125,7 +125,7 @@ const NGODashboard = () => {
 
             {/* Quick Create Event */}
             <div className="form-card" style={{ marginTop: '2rem' }}>
-                <h3>➕ Create New Event</h3>
+                <h3> Create New Event</h3>
                 <form onSubmit={handleCreateEvent}>
                     <div className="form-row">
                         <div className="form-group">
@@ -156,13 +156,13 @@ const NGODashboard = () => {
                         <input type="text" placeholder="Describe the event..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} required />
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ width: 'auto' }} disabled={isDisabled}>
-                        {loading ? '⏳ Creating...' : '➕ Create Event'}
+                        {loading ? ' Creating...' : ' Create Event'}
                     </button>
                 </form>
             </div>
 
             {/* My Events */}
-            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>📅 My Events</h3>
+            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}> My Events</h3>
             <div className="table-wrapper">
                 <table className="table">
                     <thead>
@@ -183,11 +183,11 @@ const NGODashboard = () => {
                                     <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{ev.description}</div>
                                 </td>
                                 <td>{formatDate(ev.date)}</td>
-                                <td>📍 {ev.location}</td>
+                                <td> {ev.location}</td>
                                 <td><span className={`badge ${statusBadge(ev.status)}`}>{ev.status}</span></td>
                                 <td>{ev.volunteersAssigned?.length || 0}</td>
                                 <td>
-                                    <button className="btn btn-sm btn-delete" onClick={() => handleDeleteEvent(ev._id)}>🗑️ Delete</button>
+                                    <button className="btn btn-sm btn-delete" onClick={() => handleDeleteEvent(ev._id)}>️ Delete</button>
                                 </td>
                             </tr>
                         ))}
@@ -197,7 +197,7 @@ const NGODashboard = () => {
             </div>
 
             {/* Donations Received */}
-            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>💰 Donations Received</h3>
+            <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}> Donations Received</h3>
             <div className="table-wrapper">
                 <table className="table">
                     <thead>

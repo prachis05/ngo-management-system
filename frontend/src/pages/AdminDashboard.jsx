@@ -2,6 +2,14 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+import {
+    Users,
+    IndianRupee,
+    Building2,
+    Calendar,
+    UserCheck,
+    Clock
+} from "lucide-react";
 
 const formatINR = (num) => {
     if (num === undefined || num === null) return '₹0';
@@ -66,7 +74,7 @@ const AdminDashboard = () => {
     const handleApprove = async (id) => {
         try {
             await axios.put(`http://localhost:5000/api/admin/approve/${id}`, {}, config);
-            showToast('✅ NGO approved successfully!');
+            showToast(' NGO approved successfully!');
             fetchPendingNGOs();
             fetchAllUsers();
             fetchStats();
@@ -79,7 +87,7 @@ const AdminDashboard = () => {
         if (window.confirm('Reject and remove this NGO registration?')) {
             try {
                 await axios.put(`http://localhost:5000/api/admin/reject/${id}`, {}, config);
-                showToast('❌ NGO registration rejected');
+                showToast(' NGO registration rejected');
                 fetchPendingNGOs();
                 fetchAllUsers();
                 fetchStats();
@@ -99,7 +107,7 @@ const AdminDashboard = () => {
             {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
 
             <div className="page-header">
-                <span className="icon">🛡️</span>
+                <span className="icon">️</span>
                 <div>
                     <h2>Admin Dashboard</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>System overview & management</p>
@@ -108,57 +116,84 @@ const AdminDashboard = () => {
 
             {/* Stats Grid */}
             <div className="stat-grid">
+
                 <div className="stat-card indigo">
-                    <div className="stat-icon">👥</div>
-                    <div className="stat-label">Total Users</div>
-                    <div className="stat-value" style={{ color: 'var(--primary)' }}>{stats.totalUsers || 0}</div>
+                    <div className="stat-header">
+                        <Users size={18} />
+                        <span>Total Users</span>
+                    </div>
+                    <div className="stat-value">{stats.totalUsers || 0}</div>
                 </div>
+
                 <div className="stat-card green">
-                    <div className="stat-icon">💰</div>
-                    <div className="stat-label">Total Donations</div>
-                    <div className="stat-value" style={{ color: 'var(--success)' }}>{formatINR(stats.totalDonations)}</div>
+                    <div className="stat-header">
+                        <IndianRupee size={18} />
+                        <span>Total Donations</span>
+                    </div>
+                    <div className="stat-value">{formatINR(stats.totalDonations)}</div>
                 </div>
+
                 <div className="stat-card amber">
-                    <div className="stat-icon">🏛️</div>
-                    <div className="stat-label">Approved NGOs</div>
-                    <div className="stat-value" style={{ color: 'var(--accent)' }}>{stats.totalNGOs || 0}</div>
+                    <div className="stat-header">
+                        <Building2 size={18} />
+                        <span>Approved NGOs</span>
+                    </div>
+                    <div className="stat-value">{stats.totalNGOs || 0}</div>
                 </div>
+
                 <div className="stat-card red">
-                    <div className="stat-icon">📅</div>
-                    <div className="stat-label">Total Events</div>
-                    <div className="stat-value" style={{ color: 'var(--danger)' }}>{stats.totalEvents || 0}</div>
+                    <div className="stat-header">
+                        <Calendar size={18} />
+                        <span>Total Events</span>
+                    </div>
+                    <div className="stat-value">{stats.totalEvents || 0}</div>
                 </div>
+
             </div>
 
-            {/* Secondary Stats */}
             <div className="stat-grid" style={{ marginTop: '1rem' }}>
+
                 <div className="stat-card green">
-                    <div className="stat-icon">🤝</div>
-                    <div className="stat-label">Volunteers</div>
-                    <div className="stat-value" style={{ color: 'var(--success)' }}>{stats.totalVolunteers || 0}</div>
+                    <div className="stat-header">
+                        <UserCheck size={18} />
+                        <span>Volunteers</span>
+                    </div>
+                    <div className="stat-value">{stats.totalVolunteers || 0}</div>
                 </div>
+
                 <div className="stat-card indigo">
-                    <div className="stat-icon">🎁</div>
-                    <div className="stat-label">Donors</div>
-                    <div className="stat-value" style={{ color: 'var(--primary)' }}>{stats.totalDonors || 0}</div>
+                    <div className="stat-header">
+                        <Users size={18} />
+                        <span>Donors</span>
+                    </div>
+                    <div className="stat-value">{stats.totalDonors || 0}</div>
                 </div>
+
                 <div className="stat-card amber">
-                    <div className="stat-icon">⏳</div>
-                    <div className="stat-label">Pending NGOs</div>
-                    <div className="stat-value" style={{ color: 'var(--accent)' }}>{stats.pendingNGOs || 0}</div>
+                    <div className="stat-header">
+                        <Clock size={18} />
+                        <span>Pending NGOs</span>
+                    </div>
+                    <div className="stat-value">{stats.pendingNGOs || 0}</div>
                 </div>
+
                 <div className="stat-card red">
-                    <div className="stat-icon">📋</div>
-                    <div className="stat-label">Pending Tasks</div>
-                    <div className="stat-value" style={{ color: 'var(--danger)' }}>{stats.pendingTasks || 0} <span style={{ fontSize: '0.85rem', fontWeight: 400 }}>/ {stats.totalTasks || 0}</span></div>
+                    <div className="stat-header">
+                        <Clock size={18} />
+                        <span>Pending Tasks</span>
+                    </div>
+                    <div className="stat-value">
+                        {stats.pendingTasks || 0} / {stats.totalTasks || 0}
+                    </div>
                 </div>
+
             </div>
 
             {/* Pending NGO Approvals */}
             {pendingNGOs.length > 0 && (
                 <>
                     <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        ⏳ Pending NGO Approvals
+                        Pending NGO Approvals
                     </h3>
                     <div className="table-wrapper">
                         <table className="table">
@@ -174,13 +209,13 @@ const AdminDashboard = () => {
                             <tbody>
                                 {pendingNGOs.map(ngo => (
                                     <tr key={ngo._id}>
-                                        <td style={{ fontWeight: 600 }}>🏛️ {ngo.ngoName}</td>
+                                        <td style={{ fontWeight: 600 }}>️ {ngo.ngoName}</td>
                                         <td>{ngo.name}</td>
                                         <td>{ngo.email}</td>
                                         <td>{formatDate(ngo.createdAt)}</td>
                                         <td>
-                                            <button className="btn btn-sm btn-success" onClick={() => handleApprove(ngo._id)} style={{ marginRight: '0.4rem' }}>✅ Approve</button>
-                                            <button className="btn btn-sm btn-delete" onClick={() => handleReject(ngo._id)}>❌ Reject</button>
+                                            <button className="btn btn-sm btn-success" onClick={() => handleApprove(ngo._id)} style={{ marginRight: '0.4rem' }}> Approve</button>
+                                            <button className="btn btn-sm btn-delete" onClick={() => handleReject(ngo._id)}> Reject</button>
                                         </td>
                                     </tr>
                                 ))}
@@ -192,7 +227,7 @@ const AdminDashboard = () => {
 
             {/* All NGOs */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                🏛️ All NGOs
+                ️ NGOs Overview
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -210,7 +245,7 @@ const AdminDashboard = () => {
                     <tbody>
                         {allNGOs.map(ngo => (
                             <tr key={ngo._id}>
-                                <td style={{ fontWeight: 600 }}>🏛️ {ngo.ngoName}</td>
+                                <td style={{ fontWeight: 600 }}>️ {ngo.ngoName}</td>
                                 <td>{ngo.name}</td>
                                 <td>
                                     <span className={`badge ${ngo.isApproved ? 'badge-success' : 'badge-warning'}`}>
@@ -225,7 +260,7 @@ const AdminDashboard = () => {
                                         className="btn btn-sm btn-primary"
                                         onClick={() => navigate(`/admin/ngo/${ngo._id}`)}
                                     >
-                                        🔍 View Details
+                                        View
                                     </button>
                                 </td>
                             </tr>
@@ -237,7 +272,7 @@ const AdminDashboard = () => {
 
             {/* All Users */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                👥 All Users
+                User Activity
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -277,7 +312,7 @@ const AdminDashboard = () => {
             {stats.recentDonations && stats.recentDonations.length > 0 && (
                 <>
                     <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        💰 Recent Donations
+                        Recent Transactions
                     </h3>
                     <div className="table-wrapper">
                         <table className="table">

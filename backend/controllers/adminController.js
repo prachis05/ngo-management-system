@@ -124,16 +124,45 @@ const getNGODetails = async (req, res) => {
             .sort({ date: -1 });
 
         // Volunteers assigned to this NGO's events
-        const eventIds = events.map(e => e._id);
-        const volunteers = await Volunteer.find({ assignedEvents: { $in: eventIds } })
-            .populate('assignedEvents', 'title date')
-            .sort({ name: 1 });
+        // Extract volunteers safely from events
+        let volunteers = [];
+
+        events.forEach(event => {
+            if (!event.volunteersAssigned) return;
+
+            event.volunteersAssigned.forEach(vol => {
+                if (!vol || !vol._id) return;
+
+                let existing = volunteers.find(v => v._id.toString() === vol._id.toString());
+
+                const eventData = {
+                    _id: event._id,
+                    title: event.title,
+                    date: event.date
+                };
+
+                if (!existing) {
+                    volunteers.push({
+                        _id: vol._id,
+                        name: vol.name || 'Unknown',
+                        email: vol.email || '',
+                        status: vol.status || 'Active',
+                        skills: vol.skills || [],
+                        assignedEvents: [eventData]
+                    });
+                } else {
+                    existing.assignedEvents.push(eventData);
+                }
+            });
+        });
 
         // Aggregate stats
         const totalDonations = donations.length;
         const totalAmount = donations.reduce((sum, d) => sum + (d.amount || 0), 0);
         const totalEvents = events.length;
         const totalVolunteers = volunteers.length;
+
+        console.log("VOLUNTEERS:", volunteers);
 
         res.status(200).json({
             ngo,
@@ -152,6 +181,90 @@ const getNGODetails = async (req, res) => {
     }
 };
 
+// @desc    Get pending verifications
+// @route   GET /api/admin/pending-verifications
+// @access  Private/Admin
+const getPendingVerifications = async (req, res) => {
+    try {
+        const pending = await User.find({ verificationStatus: 'Pending', role: { $in: ['NGO', 'Volunteer'] } }).select('-password');
+        res.status(200).json(pending);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Approve identity verification
+// @route   PUT /api/admin/approve-verification/:id
+// @access  Private/Admin
+const approveVerification = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.verificationStatus = 'Approved';
+        if (user.role === 'NGO') {
+            user.isApproved = true; // Auto-approve NGO status when ID is verified
+        }
+        await user.save();
+        res.status(200).json({ message: 'Verification approved', user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reject identity verification
+// @route   PUT /api/admin/reject-verification/:id
+// @access  Private/Admin
+const rejectVerification = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.verificationStatus = 'Rejected';
+        await user.save();
+        res.status(200).json({ message: 'Verification rejected' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get all volunteers with drill-down info
+// @route   GET /api/admin/volunteers
+// @access  Private/Admin
+const getAdminVolunteers = async (req, res) => {
+    try {
+        const volunteers = await Volunteer.find().populate('assignedEvents');
+        res.status(200).json(volunteers);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get single volunteer drill-down details
+// @route   GET /api/admin/volunteer/:id
+// @access  Private/Admin
+const getAdminVolunteerById = async (req, res) => {
+    try {
+        const volunteer = await Volunteer.findById(req.params.id).populate('userId', '-password');
+        if (!volunteer) return res.status(404).json({ message: 'Volunteer not found' });
+
+        // populate events and tasks
+        const events = await Event.find({ volunteersAssigned: volunteer.userId }).populate('createdBy', 'name ngoName');
+        const tasks = await require('../models/Task').find({ assignedTo: volunteer.userId }).populate('eventId', 'title');
+
+        const ngosWorkedWith = [...new Set(events.map(e => e.createdBy?.ngoName || e.createdBy?.name).filter(Boolean))];
+
+        res.status(200).json({
+            volunteer,
+            events,
+            tasks,
+            ngosWorkedWith
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getAllUsers,
     getPendingNGOs,
@@ -159,4 +272,9 @@ module.exports = {
     rejectNGO,
     getAllNGOs,
     getNGODetails,
+    getPendingVerifications,
+    approveVerification,
+    rejectVerification,
+    getAdminVolunteers,
+    getAdminVolunteerById,
 };

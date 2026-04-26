@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { useContext } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import AuthContext from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -11,11 +11,20 @@ import Events from './pages/Events';
 import Tasks from './pages/Tasks';
 import BrowseNGOs from './pages/BrowseNGOs';
 import AdminReports from './pages/AdminReports';
+import AdminVerifications from './pages/AdminVerifications';
+import AdminVolunteerList from './pages/AdminVolunteerList';
+import AdminVolunteerDetail from './pages/AdminVolunteerDetail';
+import NGOVolunteerList from './pages/NGOVolunteerList';
+import NGOVolunteerDetail from './pages/NGOVolunteerDetail';
+import VolunteerProfile from './pages/VolunteerProfile';
+import DonationDetail from './pages/DonationDetail';
 import AdminNGODetail from './pages/AdminNGODetail';
+import CreateCause from './pages/CreateCause';
+import NGOCauses from './pages/NGOCauses';
 import './index.css';
 
 const PrivateRoute = ({ children }) => {
-  const user = localStorage.getItem('user');
+  const { user } = useContext(AuthContext);
   return user ? children : <Navigate to="/login" />;
 };
 
@@ -23,84 +32,156 @@ const PrivateRoute = ({ children }) => {
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
+  const [openDropdown, setOpenDropdown] = useState(null); // 'dashboard' or 'profile'
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpenDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   if (!user) return null;
 
-  // Define navigation links per role
-  const getLinks = () => {
-    const role = user.role;
+  const toggleDropdown = (name) => {
+    setOpenDropdown(openDropdown === name ? null : name);
+  };
 
+  const closeDropdown = () => setOpenDropdown(null);
+
+  // Role-based links for Dashboard
+  const getDashboardLinks = () => {
+    const role = user.role;
     if (role === 'Admin') {
       return [
-        { to: '/', label: 'Dashboard', icon: '📊' },
-        { to: '/events', label: 'Events', icon: '📅' },
-        { to: '/volunteers', label: 'Volunteers', icon: '🤝' },
-        { to: '/donations', label: 'Donations', icon: '💰' },
-        { to: '/tasks', label: 'Task Board', icon: '📋' },
-        { to: '/admin/reports', label: 'Reports', icon: '📄' },
+        { to: '/', label: 'Overview' },
+        { to: '/events', label: 'Events' },
+        { to: '/volunteers', label: 'Volunteers' },
+        { to: '/admin/reports', label: 'Reports' },
       ];
     }
-
     if (role === 'NGO') {
-      if (!user.isApproved) {
-        return [{ to: '/', label: 'Dashboard', icon: '⏳' }];
+      if (user.verificationStatus === 'Pending' || !user.isApproved) {
+        return [{ to: '/', label: 'Overview' }];
       }
       return [
-        { to: '/', label: 'Dashboard', icon: '🏛️' },
-        { to: '/events', label: 'My Events', icon: '📅' },
-        { to: '/donations', label: 'Donations', icon: '💰' },
-        { to: '/tasks', label: 'Task Board', icon: '📋' },
+        { to: '/', label: 'Overview' },
+        { to: '/events', label: 'My Events' },
+        { to: '/ngo/volunteers', label: 'My Volunteers' },
+        { to: '/tasks', label: 'Task Board' },
+        { to: '/ngo/causes/create', label: 'Create Cause' },
       ];
     }
-
     if (role === 'Donor') {
-      return [
-        { to: '/', label: 'Dashboard', icon: '🎁' },
-        { to: '/browse-ngos', label: 'Browse NGOs', icon: '🏛️' },
-        { to: '/donations', label: 'My Donations', icon: '💰' },
-      ];
+      return [{ to: '/', label: 'Overview' }];
     }
-
     if (role === 'Volunteer') {
+      if (user.verificationStatus === 'Pending') {
+        return [{ to: '/', label: 'Overview' }];
+      }
       return [
-        { to: '/', label: 'Dashboard', icon: '🤝' },
-        { to: '/events', label: 'Events', icon: '📅' },
-        { to: '/tasks', label: 'Task Board', icon: '📋' },
+        { to: '/', label: 'Overview' },
+        { to: '/events', label: 'Events' },
+        { to: '/tasks', label: 'Task Board' },
       ];
     }
-
-    return [{ to: '/', label: 'Dashboard', icon: '📊' }];
+    return [{ to: '/', label: 'Overview' }];
   };
 
-  const links = getLinks();
-
-  const getRoleBadgeClass = () => {
-    const map = { 'Admin': 'role-admin', 'NGO': 'role-ngo', 'Donor': 'role-donor', 'Volunteer': 'role-volunteer' };
-    return map[user.role] || '';
+  // Profile Links
+  const getProfileLinks = () => {
+    const role = user.role;
+    const links = [];
+    if (role === 'Admin') {
+      links.push({ to: '/admin/verifications', label: 'Verifications' });
+    }
+    if (role === 'Volunteer' && user.verificationStatus !== 'Pending') {
+      links.push({ to: '/volunteer/profile', label: 'My Profile' });
+    }
+    return links;
   };
+
+  const dashboardLinks = getDashboardLinks();
+  const profileLinks = getProfileLinks();
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">
-        🏛️ NGO System
-        <span className={`role-badge ${getRoleBadgeClass()}`}>{user.role}</span>
+      <Link to="/" className="navbar-brand" onClick={closeDropdown}>
+        NGO System
       </Link>
-      <div className="navbar-links">
-        {links.map(link => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className={`nav-link ${location.pathname === link.to ? 'active' : ''}`}
+
+      <div className="navbar-links" ref={dropdownRef}>
+        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} onClick={closeDropdown}>Home</Link>
+        {/* Only Donor should see these */}
+        {user.role === 'Donor' && (
+          <>
+            <Link
+              to="/browse-ngos"
+              className={`nav-link ${location.pathname === '/browse-ngos' ? 'active' : ''}`}
+              onClick={closeDropdown}
+            >
+              NGOs / Causes
+            </Link>
+
+            <Link
+              to="/donations"
+              className={`nav-link ${location.pathname === '/donations' ? 'active' : ''}`}
+              onClick={closeDropdown}
+            >
+              Donations
+            </Link>
+          </>
+        )}
+
+        {/* Dashboard Dropdown */}
+        <div className="dropdown-container">
+          <button
+            className={`dropdown-button ${openDropdown === 'dashboard' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('dashboard')}
           >
-            <span>{link.icon}</span> {link.label}
-          </Link>
-        ))}
-        <div className="nav-user-info">
-          <span className="nav-user-name">{user.name}</span>
+            Dashboard ▾
+          </button>
+          {openDropdown === 'dashboard' && (
+            <div className="dropdown-menu">
+              {dashboardLinks.map(link => (
+                <Link key={link.to} to={link.to} className="dropdown-item" onClick={closeDropdown}>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-        <button className="nav-btn-logout" onClick={logout}>
-          🚪 Logout
-        </button>
+
+        {/* Profile Dropdown */}
+        <div className="dropdown-container">
+          <button
+            className={`dropdown-button ${openDropdown === 'profile' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('profile')}
+          >
+            Profile ▾
+          </button>
+          {openDropdown === 'profile' && (
+            <div className="dropdown-menu">
+              <div style={{ padding: '0.6rem 1rem', borderBottom: '1px solid var(--border)', marginBottom: '0.2rem' }}>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Signed in as</div>
+                <div style={{ fontWeight: 600, color: 'var(--text)' }}>{user.name}</div>
+                <div style={{ fontSize: '0.75rem', marginTop: '0.2rem', textTransform: 'uppercase', color: 'var(--primary)' }}>{user.role}</div>
+              </div>
+              {profileLinks.map(link => (
+                <Link key={link.to} to={link.to} className="dropdown-item" onClick={closeDropdown}>
+                  {link.label}
+                </Link>
+              ))}
+              <button className="nav-btn-logout" onClick={() => { closeDropdown(); logout(); }}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
@@ -120,7 +201,7 @@ function App() {
                 <PrivateRoute><Dashboard /></PrivateRoute>
               } />
               <Route path="/volunteers" element={
-                <PrivateRoute><Volunteers /></PrivateRoute>
+                <PrivateRoute><AdminVolunteerList /></PrivateRoute>
               } />
               <Route path="/donations" element={
                 <PrivateRoute><Donations /></PrivateRoute>
@@ -137,8 +218,36 @@ function App() {
               <Route path="/admin/reports" element={
                 <PrivateRoute><AdminReports /></PrivateRoute>
               } />
+
+              {/* identity verifications */}
+              <Route path="/admin/verifications" element={
+                <PrivateRoute><AdminVerifications /></PrivateRoute>
+              } />
+
+              {/* drill-downs */}
+              <Route path="/admin/volunteer/:id" element={
+                <PrivateRoute><AdminVolunteerDetail /></PrivateRoute>
+              } />
+              <Route path="/ngo/volunteers" element={
+                <PrivateRoute><NGOVolunteerList /></PrivateRoute>
+              } />
+              <Route path="/ngo/volunteer/:id" element={
+                <PrivateRoute><NGOVolunteerDetail /></PrivateRoute>
+              } />
+              <Route path="/volunteer/profile" element={
+                <PrivateRoute><VolunteerProfile /></PrivateRoute>
+              } />
+              <Route path="/donations/:id" element={
+                <PrivateRoute><DonationDetail /></PrivateRoute>
+              } />
               <Route path="/admin/ngo/:id" element={
                 <PrivateRoute><AdminNGODetail /></PrivateRoute>
+              } />
+              <Route path="/ngo/causes/create" element={
+                <PrivateRoute><CreateCause /></PrivateRoute>
+              } />
+              <Route path="/ngo/:id" element={
+                <PrivateRoute><NGOCauses /></PrivateRoute>
               } />
             </Routes>
           </main>

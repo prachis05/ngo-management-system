@@ -69,11 +69,12 @@ const AdminReports = () => {
     const exportCSV = () => {
         if (!report || !report.donations.length) return;
 
-        const headers = ['Donor', 'NGO', 'Campaign', 'Amount (₹)', 'Status', 'Date'];
+        const headers = ['Donor', 'NGO', 'Campaign', 'Type', 'Amount (₹)', 'Status', 'Date'];
         const rows = report.donations.map(d => [
             d.donorName,
             d.ngoName || 'General',
             d.campaign,
+            d.isRecurring ? 'Monthly' : 'One-Time',
             d.amount,
             d.status,
             formatDate(d.createdAt),
@@ -97,7 +98,7 @@ const AdminReports = () => {
     return (
         <div className="container">
             <div className="page-header">
-                <span className="icon">📊</span>
+                <span className="icon"></span>
                 <div>
                     <h2>Report Generation</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Generate filtered reports with insights</p>
@@ -106,7 +107,7 @@ const AdminReports = () => {
 
             {/* Filters */}
             <div className="form-card">
-                <h3>🔍 Report Filters</h3>
+                <h3> Report Filters</h3>
                 <div className="form-row">
                     <div className="form-group">
                         <label>Start Date</label>
@@ -150,14 +151,14 @@ const AdminReports = () => {
                         onClick={generateReport}
                         disabled={loading}
                     >
-                        {loading ? '⏳ Generating...' : '📊 Generate Report'}
+                        {loading ? ' Generating...' : ' Generate Report'}
                     </button>
                     <button className="btn btn-secondary" onClick={clearFilters}>
-                        🔄 Clear Filters
+                         Clear Filters
                     </button>
                     {report && report.donations.length > 0 && (
                         <button className="btn btn-success" style={{ marginLeft: 'auto' }} onClick={exportCSV}>
-                            📥 Export CSV
+                             Export CSV
                         </button>
                     )}
                 </div>
@@ -169,17 +170,17 @@ const AdminReports = () => {
                     {/* Summary Stats */}
                     <div className="stat-grid" style={{ marginTop: '2rem' }}>
                         <div className="stat-card green">
-                            <div className="stat-icon">💰</div>
+                            <div className="stat-icon"></div>
                             <div className="stat-label">Total Amount</div>
                             <div className="stat-value" style={{ color: 'var(--success)' }}>{formatINR(report.totalAmount)}</div>
                         </div>
                         <div className="stat-card indigo">
-                            <div className="stat-icon">🎁</div>
+                            <div className="stat-icon"></div>
                             <div className="stat-label">Total Donations</div>
                             <div className="stat-value" style={{ color: 'var(--primary)' }}>{report.totalDonations}</div>
                         </div>
                         <div className="stat-card amber">
-                            <div className="stat-icon">📅</div>
+                            <div className="stat-icon"></div>
                             <div className="stat-label">Total Events</div>
                             <div className="stat-value" style={{ color: 'var(--accent)' }}>{report.totalEvents}</div>
                         </div>
@@ -189,7 +190,7 @@ const AdminReports = () => {
                     <div className="chart-grid" style={{ marginTop: '1.5rem' }}>
                         {/* Monthly Trend Bar Chart */}
                         <div className="chart-card">
-                            <h3>📈 Monthly Donation Trend</h3>
+                            <h3> Monthly Donation Trend</h3>
                             {report.monthlyTrend.some(m => m.amount > 0) ? (
                                 <div className="bar-chart">
                                     {report.monthlyTrend.map((m, i) => (
@@ -199,7 +200,7 @@ const AdminReports = () => {
                                                 className="bar"
                                                 style={{
                                                     height: `${(m.amount / maxTrendAmount) * 100}%`,
-                                                    background: `linear-gradient(180deg, ${pieColors[i % pieColors.length]}, ${pieColors[i % pieColors.length]}88)`,
+                                                    background: pieColors[i % pieColors.length],
                                                 }}
                                             ></div>
                                             <div className="bar-label">{m.month}</div>
@@ -213,7 +214,7 @@ const AdminReports = () => {
 
                         {/* Donations by NGO - Pie-style breakdown */}
                         <div className="chart-card">
-                            <h3>🏛️ Donations by NGO</h3>
+                            <h3>️ Donations by NGO</h3>
                             {report.donationsByNGO.length > 0 ? (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
                                     {report.donationsByNGO.map((ngo, i) => {
@@ -240,7 +241,7 @@ const AdminReports = () => {
                                                     <div style={{
                                                         height: '100%', borderRadius: '4px',
                                                         width: `${pct}%`,
-                                                        background: `linear-gradient(90deg, ${pieColors[i % pieColors.length]}, ${pieColors[i % pieColors.length]}88)`,
+                                                        background: pieColors[i % pieColors.length],
                                                         transition: 'width 0.6s ease',
                                                     }}></div>
                                                 </div>
@@ -256,7 +257,7 @@ const AdminReports = () => {
 
                     {/* Donations Table */}
                     <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        💰 Donation Records ({report.totalDonations})
+                         Donation Records ({report.totalDonations})
                     </h3>
                     <div className="table-wrapper">
                         <table className="table">
@@ -265,6 +266,7 @@ const AdminReports = () => {
                                     <th>Donor</th>
                                     <th>NGO</th>
                                     <th>Campaign</th>
+                                    <th>Type</th>
                                     <th>Amount</th>
                                     <th>Status</th>
                                     <th>Date</th>
@@ -274,9 +276,14 @@ const AdminReports = () => {
                                 {report.donations.map(d => (
                                     <tr key={d._id}>
                                         <td style={{ fontWeight: 500 }}>{d.donorName}</td>
-                                        <td>🏛️ {d.ngoName || 'General'}</td>
+                                        <td>️ {d.ngoName || 'General'}</td>
                                         <td>{d.campaign}</td>
-                                        <td style={{ fontWeight: 600 }}>{formatINR(d.amount)}</td>
+                                        <td>
+                                            <span className={`badge ${d.isRecurring ? 'badge-info' : 'badge-default'}`}>
+                                                {d.isRecurring ? 'Monthly' : 'One-Time'}
+                                            </span>
+                                        </td>
+                                        <td style={{ fontWeight: 600 }}>{formatINR(d.amount)}{d.isRecurring ? '/mo' : ''}</td>
                                         <td>
                                             <span className={`badge ${d.status === 'Completed' ? 'badge-success' : d.status === 'Pending' ? 'badge-warning' : 'badge-danger'}`}>
                                                 {d.status}
@@ -286,7 +293,7 @@ const AdminReports = () => {
                                     </tr>
                                 ))}
                                 {report.donations.length === 0 && (
-                                    <tr><td colSpan="6" className="table-empty">No donations match the filters</td></tr>
+                                    <tr><td colSpan="7" className="table-empty">No donations match the filters</td></tr>
                                 )}
                             </tbody>
                         </table>
@@ -294,7 +301,7 @@ const AdminReports = () => {
 
                     {/* Events Table */}
                     <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        📅 Event Records ({report.totalEvents})
+                         Event Records ({report.totalEvents})
                     </h3>
                     <div className="table-wrapper">
                         <table className="table">
@@ -315,9 +322,9 @@ const AdminReports = () => {
                                             <strong>{ev.title}</strong>
                                             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{ev.description}</div>
                                         </td>
-                                        <td>🏛️ {ev.createdBy?.ngoName || ev.createdBy?.name || '-'}</td>
+                                        <td>️ {ev.createdBy?.ngoName || ev.createdBy?.name || '-'}</td>
                                         <td>{formatDate(ev.date)}</td>
-                                        <td>📍 {ev.location}</td>
+                                        <td> {ev.location}</td>
                                         <td>
                                             <span className={`badge ${
                                                 ev.status === 'Completed' ? 'badge-success' :
@@ -340,7 +347,7 @@ const AdminReports = () => {
             {/* Empty state before generating */}
             {!generated && (
                 <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-muted)' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}></div>
                     <h3 style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--dark)' }}>No Report Generated Yet</h3>
                     <p>Use the filters above and click "Generate Report" to view insights.</p>
                 </div>

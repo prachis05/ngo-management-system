@@ -13,8 +13,11 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role, ngoName } = req.body;
+    const { name, email, password, role, ngoName, city, skills } = req.body;
+    const parsedSkills = skills ? JSON.parse(skills) : [];
 
+    console.log("RAW skills from frontend:", skills);
+    console.log("PARSED skills:", parsedSkills);
     try {
         // Block Admin registration from UI
         if (role === 'Admin') {
@@ -33,6 +36,20 @@ const registerUser = async (req, res) => {
         // NGO users start as unapproved
         const isApproved = role === 'NGO' ? false : true;
 
+        // Identity Verification
+        let idProofPath = null;
+        let vStatus = 'Approved';
+
+        if (role === 'NGO' || role === 'Volunteer') {
+            vStatus = 'Pending';
+            if (req.file) {
+                // store relative path
+                idProofPath = req.file.filename;
+            } else {
+                return res.status(400).json({ message: 'ID Proof document is required for NGO and Volunteer registration.' });
+            }
+        }
+
         const user = await User.create({
             name,
             email,
@@ -40,6 +57,10 @@ const registerUser = async (req, res) => {
             role: role || 'Volunteer',
             ngoName: role === 'NGO' ? ngoName : '',
             isApproved,
+            idProof: idProofPath,
+            verificationStatus: vStatus,
+            city: role === 'Volunteer' ? city : '',
+            skills: role === 'Volunteer' ? parsedSkills : [],
         });
 
         // Auto-create volunteer record when a user registers as Volunteer
@@ -48,7 +69,8 @@ const registerUser = async (req, res) => {
                 userId: user._id,
                 name: user.name,
                 email: user.email,
-                skills: [],
+                skills: parsedSkills,
+                city: city,
                 status: 'Available',
             });
         }
@@ -61,6 +83,7 @@ const registerUser = async (req, res) => {
                 role: user.role,
                 ngoName: user.ngoName,
                 isApproved: user.isApproved,
+                verificationStatus: user.verificationStatus,
                 token: generateToken(user.id),
             });
         } else {
@@ -88,6 +111,7 @@ const loginUser = async (req, res) => {
                 role: user.role,
                 ngoName: user.ngoName,
                 isApproved: user.isApproved,
+                verificationStatus: user.verificationStatus,
                 token: generateToken(user.id),
             });
         } else {

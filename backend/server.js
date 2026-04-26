@@ -11,9 +11,13 @@ connectDB();
 
 const app = express();
 
+const path = require('path');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -23,6 +27,8 @@ app.use('/api/donations', require('./routes/donationRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/ngo', require('./routes/ngoRoutes'));
+app.use('/api/causes', require('./routes/causeRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {

@@ -31,6 +31,14 @@ const volunteerSchema = mongoose.Schema(
                 ref: 'Event',
             },
         ],
+        city: {
+            type: String,
+            default: ''
+        },
+        skills: {
+            type: [String],
+            default: []
+        }
     },
     {
         timestamps: true,

@@ -20,7 +20,7 @@ const Login = () => {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <div style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '0.5rem' }}>🏛️</div>
+                <div style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '0.5rem' }}>️</div>
                 <h2>Welcome Back</h2>
                 <p className="auth-subtitle">Sign in to NGO Management System</p>
                 <form onSubmit={onSubmit}>
@@ -33,7 +33,7 @@ const Login = () => {
                         <input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                     <button type="submit" className="btn-primary" disabled={isDisabled}>
-                        {loading ? '⏳ Signing in...' : '🔐 Sign In'}
+                        {loading ? ' Signing in...' : ' Sign In'}
                     </button>
                     <p className="auth-link">Don't have an account? <Link to="/register">Create one</Link></p>
                 </form>

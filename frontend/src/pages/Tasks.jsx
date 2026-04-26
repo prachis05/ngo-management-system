@@ -47,9 +47,9 @@ const Tasks = () => {
     };
 
     const columns = [
-        { key: 'To Do',       label: '📝 To Do',        className: 'todo' },
-        { key: 'In Progress', label: '🔄 In Progress',  className: 'progress' },
-        { key: 'Done',        label: '✅ Done',          className: 'done' },
+        { key: 'To Do',       label: ' To Do',        className: 'todo' },
+        { key: 'In Progress', label: ' In Progress',  className: 'progress' },
+        { key: 'Done',        label: ' Done',          className: 'done' },
     ];
 
     const isDisabled = !formData.title || loading;
@@ -57,13 +57,13 @@ const Tasks = () => {
     return (
         <div className="container">
             <div className="page-header">
-                <span className="icon">📋</span>
+                <span className="icon"></span>
                 <h2>Agile Task Board</h2>
             </div>
 
             {/* Create Task Form */}
             <div className="form-card" style={{ marginBottom: '1.5rem' }}>
-                <h3>➕ New Task</h3>
+                <h3> New Task</h3>
                 <form onSubmit={handleCreate} style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
                     <div className="form-group" style={{ flex: 1, minWidth: '200px', marginBottom: 0 }}>
                         <label>Title</label>
@@ -74,7 +74,7 @@ const Tasks = () => {
                         <input type="text" placeholder="Optional description..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                     </div>
                     <button type="submit" className="btn btn-success btn-sm" style={{ padding: '0.7rem 1.25rem', marginBottom: '0' }} disabled={isDisabled}>
-                        {loading ? '⏳' : '➕ Add Task'}
+                        {loading ? '' : ' Add Task'}
                     </button>
                 </form>
             </div>
@@ -99,12 +99,12 @@ const Tasks = () => {
                                             value={task.status} 
                                             onChange={(e) => handleMove(task, e.target.value)}
                                         >
-                                            <option value="To Do">📝 To Do</option>
-                                            <option value="In Progress">🔄 In Progress</option>
-                                            <option value="Done">✅ Done</option>
+                                            <option value="To Do"> To Do</option>
+                                            <option value="In Progress"> In Progress</option>
+                                            <option value="Done"> Done</option>
                                         </select>
                                         <button className="btn btn-sm btn-delete" onClick={() => handleDelete(task._id)}>
-                                            🗑️
+                                            ️
                                         </button>
                                     </div>
                                 </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 
 const BrowseNGOs = () => {
@@ -24,7 +25,7 @@ const BrowseNGOs = () => {
     return (
         <div className="container">
             <div className="page-header">
-                <span className="icon">🏛️</span>
+                <span className="icon">️</span>
                 <h2>Browse NGOs</h2>
             </div>
 
@@ -41,16 +42,18 @@ const BrowseNGOs = () => {
             ) : (
                 <div className="ngo-cards-grid">
                     {ngos.map(ngo => (
-                        <div key={ngo._id} className="card ngo-card">
-                            <div className="ngo-card-icon">🏛️</div>
-                            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.25rem' }}>
-                                {ngo.ngoName || ngo.name}
-                            </h3>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                                Managed by {ngo.name}
-                            </p>
-                            <span className="badge badge-success">✅ Verified</span>
-                        </div>
+                        <Link to={`/ngo/${ngo._id}`} key={ngo._id} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <div className="card ngo-card" style={{ cursor: 'pointer', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-5px)' } }}>
+                                <div className="ngo-card-icon">️</div>
+                                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+                                    {ngo.ngoName || ngo.name}
+                                </h3>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                                    Managed by {ngo.name}
+                                </p>
+                                <span className="badge badge-success"> Verified</span>
+                            </div>
+                        </Link>
                     ))}
                 </div>
             )}

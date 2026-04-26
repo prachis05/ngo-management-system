@@ -1,5 +1,6 @@
 const Donation = require('../models/Donation');
 const User = require('../models/User');
+const Cause = require('../models/Cause');
 
 // @desc    Get all donations (role-aware)
 // @route   GET /api/donations
@@ -24,7 +25,7 @@ const getDonations = async (req, res) => {
 // @route   POST /api/donations
 // @access  Private
 const addDonation = async (req, res) => {
-    const { amount, campaign, ngoId } = req.body;
+    const { amount, campaign, ngoId, causeId, isRecurring, frequency } = req.body;
     try {
         let ngoName = '';
         if (ngoId) {
@@ -32,14 +33,28 @@ const addDonation = async (req, res) => {
             if (ngo) ngoName = ngo.ngoName || ngo.name;
         }
 
+        let actualCampaignName = campaign;
+        
+        if (causeId) {
+            const cause = await Cause.findById(causeId);
+            if (cause) {
+                cause.raisedAmount += Number(amount);
+                await cause.save();
+                actualCampaignName = cause.title;
+            }
+        }
+
         const donation = await Donation.create({
             donorId: req.user._id,
             donorName: req.user.name,
             ngoId: ngoId || null,
             ngoName,
+            causeId: causeId || null,
             amount,
-            campaign,
-            status: 'Completed'
+            campaign: actualCampaignName || 'General Donation',
+            status: 'Completed',
+            isRecurring: isRecurring || false,
+            frequency: frequency || 'One-Time'
         });
         res.status(201).json(donation);
     } catch (error) {
@@ -64,6 +79,32 @@ const updateDonationStatus = async (req, res) => {
     }
 };
 
+// @desc    Get donor's own donations
+// @route   GET /api/donations/my
+// @access  Private/Donor
+const getMyDonations = async (req, res) => {
+    try {
+        const donations = await Donation.find({ donorId: req.user._id }).sort({ createdAt: -1 });
+        res.status(200).json(donations);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get single donation drill-down (Donor specific)
+// @route   GET /api/donations/:id/details
+// @access  Private/Donor
+const getDonationById = async (req, res) => {
+    try {
+        const donation = await Donation.findOne({ _id: req.params.id, donorId: req.user._id });
+        if (!donation) return res.status(404).json({ message: 'Donation not found or unauthorized' });
+
+        res.status(200).json(donation);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Get list of approved NGOs (for donor dropdown)
 // @route   GET /api/donations/ngos
 // @access  Private
@@ -81,4 +122,6 @@ module.exports = {
     addDonation,
     updateDonationStatus,
     getApprovedNGOs,
+    getMyDonations,
+    getDonationById,
 };

@@ -20,6 +20,11 @@ const donationSchema = mongoose.Schema(
             type: String,
             default: '',
         },
+        causeId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Cause',
+            required: false,
+        },
         amount: {
             type: Number,
             required: true,
@@ -32,6 +37,15 @@ const donationSchema = mongoose.Schema(
             type: String,
             enum: ['Pending', 'Completed', 'Failed'],
             default: 'Completed',
+        },
+        isRecurring: {
+            type: Boolean,
+            default: false,
+        },
+        frequency: {
+            type: String,
+            enum: ['One-Time', 'Monthly'],
+            default: 'One-Time',
         },
     },
     {

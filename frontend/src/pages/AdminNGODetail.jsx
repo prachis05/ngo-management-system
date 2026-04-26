@@ -20,13 +20,24 @@ const AdminNGODetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const config = { headers: { Authorization: `Bearer ${user.token}` } };
+    const config = {
+        headers: {
+            Authorization: user?.token ? `Bearer ${user.token}` : ''
+        }
+    };
 
     useEffect(() => {
-        fetchNGODetails();
-    }, [id]);
+        if (user) {
+            fetchNGODetails();
+        }
+    }, [id, user]);
 
     const fetchNGODetails = async () => {
+        if (!user || !user.token) {
+            setError("User not authenticated");
+            setLoading(false);
+            return;
+        }
         try {
             setLoading(true);
             const { data: result } = await axios.get(`http://localhost:5000/api/admin/ngo/${id}/details`, config);
@@ -115,7 +126,7 @@ const AdminNGODetail = () => {
         return (
             <div className="container">
                 <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>⏳</div>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
                     <p style={{ color: 'var(--text-muted)' }}>Loading NGO details...</p>
                 </div>
             </div>
@@ -126,7 +137,7 @@ const AdminNGODetail = () => {
         return (
             <div className="container">
                 <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>❌</div>
+                    <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}></div>
                     <p style={{ color: 'var(--danger)' }}>{error}</p>
                     <button className="btn btn-primary" onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
                         ← Back to Dashboard
@@ -152,7 +163,7 @@ const AdminNGODetail = () => {
                     </button>
                     <div>
                         <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            🏛️ {ngo.ngoName}
+                            ️ {ngo.ngoName}
                         </h2>
                         <p style={{ margin: '0.25rem 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                             Managed by {ngo.name} • {ngo.email}
@@ -161,10 +172,10 @@ const AdminNGODetail = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <span className={`badge ${ngo.isApproved ? 'badge-success' : 'badge-warning'}`}>
-                        {ngo.isApproved ? '✅ Approved' : '⏳ Pending'}
+                        {ngo.isApproved ? ' Approved' : ' Pending'}
                     </span>
                     <button className="btn btn-primary" onClick={generateReport}>
-                        📄 Generate Report
+                         Generate Report
                     </button>
                 </div>
             </div>
@@ -172,22 +183,22 @@ const AdminNGODetail = () => {
             {/* Stats */}
             <div className="stat-grid">
                 <div className="stat-card green">
-                    <div className="stat-icon">💰</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Total Donations</div>
                     <div className="stat-value" style={{ color: 'var(--success)' }}>{stats.totalDonations}</div>
                 </div>
                 <div className="stat-card indigo">
-                    <div className="stat-icon">💵</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Total Amount</div>
                     <div className="stat-value" style={{ color: 'var(--primary)' }}>{formatINR(stats.totalAmount)}</div>
                 </div>
                 <div className="stat-card amber">
-                    <div className="stat-icon">📅</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Total Events</div>
                     <div className="stat-value" style={{ color: 'var(--accent)' }}>{stats.totalEvents}</div>
                 </div>
                 <div className="stat-card red">
-                    <div className="stat-icon">🤝</div>
+                    <div className="stat-icon"></div>
                     <div className="stat-label">Total Volunteers</div>
                     <div className="stat-value" style={{ color: 'var(--danger)' }}>{stats.totalVolunteers}</div>
                 </div>
@@ -195,7 +206,7 @@ const AdminNGODetail = () => {
 
             {/* Donations Table */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                💰 Donations ({donations.length})
+                 Donations ({donations.length})
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -231,7 +242,7 @@ const AdminNGODetail = () => {
 
             {/* Events Table */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                📅 Events ({events.length})
+                 Events ({events.length})
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -251,12 +262,11 @@ const AdminNGODetail = () => {
                                 <td>{formatDate(e.date)}</td>
                                 <td>{e.location}</td>
                                 <td>
-                                    <span className={`badge ${
-                                        e.status === 'Completed' ? 'badge-success' :
+                                    <span className={`badge ${e.status === 'Completed' ? 'badge-success' :
                                         e.status === 'Upcoming' ? 'badge-info' :
-                                        e.status === 'Ongoing' ? 'badge-warning' :
-                                        'badge-danger'
-                                    }`}>
+                                            e.status === 'Ongoing' ? 'badge-warning' :
+                                                'badge-danger'
+                                        }`}>
                                         {e.status}
                                     </span>
                                 </td>
@@ -277,7 +287,7 @@ const AdminNGODetail = () => {
 
             {/* Volunteers Table */}
             <h3 style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                🤝 Volunteers ({volunteers.length})
+                 Volunteers ({volunteers.length})
             </h3>
             <div className="table-wrapper">
                 <table className="table">
@@ -297,11 +307,10 @@ const AdminNGODetail = () => {
                                 <td>{v.email}</td>
                                 <td>{v.skills && v.skills.length > 0 ? v.skills.join(', ') : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                                 <td>
-                                    <span className={`badge ${
-                                        v.status === 'Available' ? 'badge-success' :
+                                    <span className={`badge ${v.status === 'Available' ? 'badge-success' :
                                         v.status === 'Assigned' ? 'badge-info' :
-                                        'badge-warning'
-                                    }`}>
+                                            'badge-warning'
+                                        }`}>
                                         {v.status}
                                     </span>
                                 </td>

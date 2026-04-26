@@ -20,7 +20,7 @@ const Dashboard = () => {
                     maxWidth: '500px',
                     margin: '2rem auto'
                 }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
+                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}></div>
                     <h2 style={{ marginBottom: '0.75rem', color: 'var(--dark)' }}>Approval Pending</h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.6 }}>
                         Your NGO registration for <strong>{user.ngoName}</strong> is currently under review. 

@@ -144,7 +144,7 @@ JWT_SECRET=your_secret_key
 
 ```
 cd backend
-npm run dev
+node server.js
 ```
 
 #### Start frontend
@@ -159,26 +159,10 @@ npm run dev
 ## Future Enhancements
 
 * Payment gateway integration (Stripe/Razorpay)
-* Image upload for NGOs and causes
 * Advanced filtering and search
 * Notifications system
 * Mobile responsiveness improvements
 
----
-
-## UI Improvements
-
-* Clean, modern dashboard design
-* Role-based navigation
-* Placeholder images for missing NGO content
-* Improved card layouts and spacing
-* Dropdown-based navigation for better usability
-
----
-
-## Author
-
-Developed as part of a Software Engineering project.
 
 ---
 

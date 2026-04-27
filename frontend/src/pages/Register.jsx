@@ -11,7 +11,8 @@ const Register = () => {
         ngoName: '',
         idProof: null,
         city: '',
-        skills: ''
+        skills: '',
+        phone: ''
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -19,7 +20,7 @@ const Register = () => {
 
     const navigate = useNavigate();
 
-    const { name, email, password, role, ngoName, idProof, city, skills } = formData;
+    const { name, email, password, role, ngoName, idProof, city, skills, phone } = formData;
 
     const onChange = (e) => {
         if (e.target.name === 'idProof') {
@@ -59,8 +60,14 @@ const Register = () => {
             }
 
             if (role === 'Volunteer') {
+                if (!phone) {
+                    setError('Phone Number is required for this role.');
+                    setLoading(false);
+                    return;
+                }
                 data.append('city', city);
                 data.append('skills', JSON.stringify(skillArray));
+                data.append('phone', phone);
             }
 
 
@@ -152,6 +159,18 @@ const Register = () => {
                                     value={skills}
                                     onChange={onChange}
                                     placeholder="e.g. Teaching, Cooking, Driving"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Phone Number</label>
+                                <input
+                                    type="number"
+                                    name="phone"
+                                    value={phone}
+                                    onChange={onChange}
+                                    placeholder="Enter your phone number"
                                     required
                                 />
                             </div>

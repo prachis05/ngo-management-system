@@ -120,7 +120,7 @@ const getNGODetails = async (req, res) => {
 
         // Events created by this NGO
         const events = await Event.find({ createdBy: ngo._id })
-            .populate('volunteersAssigned', 'name email')
+            .populate('volunteersAssigned', 'name email city skills')
             .sort({ date: -1 });
 
         // Volunteers assigned to this NGO's events
@@ -146,8 +146,9 @@ const getNGODetails = async (req, res) => {
                         _id: vol._id,
                         name: vol.name || 'Unknown',
                         email: vol.email || '',
-                        status: vol.status || 'Active',
+                        city: vol.city || '',
                         skills: vol.skills || [],
+                        status: vol.status || 'Active',
                         assignedEvents: [eventData]
                     });
                 } else {
@@ -155,6 +156,15 @@ const getNGODetails = async (req, res) => {
                 }
             });
         });
+
+        // Enrich volunteers with phone from the Volunteer collection (phone lives there, not on User)
+        if (volunteers.length > 0) {
+            const userIds = volunteers.map(v => v._id);
+            const volunteerDocs = await Volunteer.find({ userId: { $in: userIds } }).select('userId phone');
+            const phoneMap = {};
+            volunteerDocs.forEach(vd => { phoneMap[vd.userId.toString()] = vd.phone; });
+            volunteers.forEach(v => { v.phone = phoneMap[v._id.toString()] || ''; });
+        }
 
         // Aggregate stats
         const totalDonations = donations.length;

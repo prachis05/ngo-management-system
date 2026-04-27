@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import { Link } from 'react-router-dom';
+import logo from '../assets/image.png';
 
 const Login = () => {
     const { login } = useContext(AuthContext);
@@ -20,9 +21,11 @@ const Login = () => {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <div style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '0.5rem' }}>️</div>
+                <div style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '0.5rem' }}>
+                    <img src={logo} alt="Logo" style={{ width: '50%', borderRadius: '50%' }} />
+                </div>
                 <h2>Welcome Back</h2>
-                <p className="auth-subtitle">Sign in to NGO Management System</p>
+                <p className="auth-subtitle">Sign in to NGO Management Portal</p>
                 <form onSubmit={onSubmit}>
                     <div className="form-group">
                         <label>Email Address</label>

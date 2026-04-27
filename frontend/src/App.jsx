@@ -111,7 +111,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <Link to="/" className="navbar-brand" onClick={closeDropdown}>
-        NGO System
+        NGO Management Portal
       </Link>
 
       <div className="navbar-links" ref={dropdownRef}>

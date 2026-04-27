@@ -46,6 +46,16 @@ const AdminVolunteerDetail = () => {
                         </span>
                     </div>
                     <p style={{ color: 'var(--text-muted)' }}>{volunteer.email}</p>
+                    {volunteer.phone && (
+                        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                            📞 {volunteer.phone}
+                        </p>
+                    )}
+                    {volunteer.city && (
+                        <p style={{ color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                            📍 {volunteer.city}
+                        </p>
+                    )}
                     
                     <div style={{ marginTop: '1rem' }}>
                         <strong>Skills: </strong>

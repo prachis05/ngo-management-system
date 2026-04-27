@@ -38,7 +38,11 @@ const volunteerSchema = mongoose.Schema(
         skills: {
             type: [String],
             default: []
-        }
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
     },
     {
         timestamps: true,

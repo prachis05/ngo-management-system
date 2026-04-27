@@ -13,7 +13,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role, ngoName, city, skills } = req.body;
+    const { name, email, password, role, ngoName, city, skills, phone } = req.body;
     const parsedSkills = skills ? JSON.parse(skills) : [];
 
     console.log("RAW skills from frontend:", skills);
@@ -61,6 +61,7 @@ const registerUser = async (req, res) => {
             verificationStatus: vStatus,
             city: role === 'Volunteer' ? city : '',
             skills: role === 'Volunteer' ? parsedSkills : [],
+            phone: role === 'Volunteer' ? phone : '',
         });
 
         // Auto-create volunteer record when a user registers as Volunteer
@@ -71,6 +72,7 @@ const registerUser = async (req, res) => {
                 email: user.email,
                 skills: parsedSkills,
                 city: city,
+                phone: phone,
                 status: 'Available',
             });
         }

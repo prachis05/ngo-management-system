@@ -144,6 +144,7 @@ const getVolunteerActivity = async (req, res) => {
         const ngosWorkedWith = [...new Set(events.map(e => e.createdBy?.ngoName || e.createdBy?.name).filter(Boolean))];
 
         res.status(200).json({
+            volunteer,
             events,
             tasks,
             ngosWorkedWith

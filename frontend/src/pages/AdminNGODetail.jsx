@@ -295,6 +295,7 @@ const AdminNGODetail = () => {
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone</th>
                             <th>Skills</th>
                             <th>Status</th>
                             <th>Assigned Events</th>
@@ -305,6 +306,7 @@ const AdminNGODetail = () => {
                             <tr key={v._id}>
                                 <td style={{ fontWeight: 500 }}>{v.name}</td>
                                 <td>{v.email}</td>
+                                <td>{v.phone || <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                                 <td>{v.skills && v.skills.length > 0 ? v.skills.join(', ') : <span style={{ color: 'var(--text-muted)' }}>—</span>}</td>
                                 <td>
                                     <span className={`badge ${v.status === 'Available' ? 'badge-success' :
@@ -323,7 +325,7 @@ const AdminNGODetail = () => {
                             </tr>
                         ))}
                         {volunteers.length === 0 && (
-                            <tr><td colSpan="5" className="table-empty">No volunteers assigned to this NGO's events</td></tr>
+                            <tr><td colSpan="6" className="table-empty">No volunteers assigned to this NGO's events</td></tr>
                         )}
                     </tbody>
                 </table>
